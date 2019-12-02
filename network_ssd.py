@@ -3,7 +3,7 @@
 Created on Fri Nov 29 16:31:46 2019
 
 This class is responsible for detecting object(s) in the image or frame.
-It initialize the network, blob, setInput and run the prediction.
+It initialize the network, blob, setInput and run the prediction etc.
 
 @author: jschang
 """
