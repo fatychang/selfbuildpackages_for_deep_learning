@@ -17,8 +17,8 @@ class SSD:
     def __init__(self, confidence=0.5): 
         # initialize the ssd class 
         # and set the confidence level
-        self.path_prototxt = None
-        self.path_model = None
+        self.path_prototxt = "D:\\Jen\\_Documents\\eLearning\\Computer Vision\\pyimagesearch\\real-time-object-detection\\MobileNetSSD_deploy.prototxt.txt"
+        self.path_model = "D:\\Jen\\_Documents\\eLearning\\Computer Vision\\pyimagesearch\\real-time-object-detection\\MobileNetSSD_deploy.caffemodel"
         self.confidence = confidence
         self.net = None
         self.labels = None
@@ -28,7 +28,9 @@ class SSD:
         self.h = None
         self.w = None
         
+        self.COLORS = []
         self.box_center = []
+        self.ignored = []
 
             
     def start(self):
@@ -45,15 +47,15 @@ class SSD:
     
     def generate_colors(self, length):
         # generate randon color list for each class
-        self.colors = np.random.randint(0, 255, (length, 3), dtype="uint8")
+        self.COLORS = np.random.randint(0, 255, (length, 3), dtype="uint8")
         
         return self.colors
     
     
-    def load_model(self, prototxt, model):
+    def load_model(self):
         # load the model from local disk 
         # and return the net
-        self.net = cv2.dnn.readNetFromCaffe(prototxt, model)
+        self.net = cv2.dnn.readNetFromCaffe(self.path_prototxt, self.path_model)
         
     def blob_image(self, image):
         # convert the image to a blob
@@ -87,9 +89,9 @@ class SSD:
         return (detections[0, 0, idx, 3:7] * np.asarray(
                 [self.w, self.h, self.w, self.h])).astype("int")
         
-    def get_color(self, COLORS, idx):
+    def get_color(self, idx):
         # return the corresponding color
-        return [int (c) for c in COLORS[idx]]
+        return [int (c) for c in self.COLORS[idx]]
     
     def draw_bounding_box(self, image, detections, idx, COLORS):
         # draw the bounding box on image and its descriptions
@@ -97,7 +99,7 @@ class SSD:
         confidence = self.get_confidence(detections, idx)
         class_idx = self.get_class_idx(detections, idx)
         label = self.get_class_label(class_idx)
-        color = self.get_color(COLORS, class_idx)
+        color = self.get_color(class_idx)
         (startX, startY, endX, endY) = self.get_bounding_box(detections, idx)
         
         text = "{}: {:.2f}%".format(label, confidence * 100)
@@ -124,4 +126,14 @@ class SSD:
         # clear the list storing the position of the center of the box
         self.box_center = []
          
+    def set_model_prototext_path(self, path):
+        # set the prototxt path if it's not at default location
+        self.path_prototxt = path
+        
+    def set_model_path(self, path):
+        # set the model path if it's not at default location
+        self.path_model = path
+    
+    def set_ignored_classes(self, ignored):
+        self.ignored = ignored
         
